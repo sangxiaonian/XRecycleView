@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FreeRecycleView</string>
+    <string name="toast_no_init">FreeRecycleView</string>
+</resources>
