@@ -52,7 +52,6 @@ public class BaseRecycleView extends RecyclerView {
         FRLog.d(getOverScrollMode() + "-----------onScrollStateChanged-----------" + state);
 
 
-
         if (ORIENTATION == 1) {
             TOP = !canScrollVertically(-1);
             BOOTOM = !canScrollVertically(1) && !TOP;
@@ -87,18 +86,34 @@ public class BaseRecycleView extends RecyclerView {
 
         if (currentTimeMillis == 0) {
             currentTimeMillis = System.currentTimeMillis();
-            currentY = computeVerticalScrollOffset();
+            currentY = getscroll();
         } else {
             long timegap = System.currentTimeMillis() - currentTimeMillis;
             if (timegap >= 100) {
-                FRLog.i(computeHorizontalScrollOffset()+">>>"+currentY);
-                speed = (computeHorizontalScrollOffset() - currentY) / timegap;
+                FRLog.i(getscroll() + ">>>" + currentY);
+                speed = (getscroll() - currentY) / timegap;
                 currentTimeMillis = System.currentTimeMillis();
-                currentY = computeVerticalScrollOffset();
-                FRLog.e(speed + "");
+                currentY = getscroll();
+
             }
         }
 
+    }
+
+    /**
+     * 获取滑动距离
+     * @return
+     */
+    public float getscroll() {
+        if (ORIENTATION==LinearLayoutManager.VERTICAL){
+            return computeVerticalScrollOffset();
+        }else {
+            return computeHorizontalScrollOffset();
+        }
+    }
+
+    public float getscr() {
+        return super.getScaleY();
     }
 
     @Override
