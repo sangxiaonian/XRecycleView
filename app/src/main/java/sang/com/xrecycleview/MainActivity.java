@@ -14,10 +14,11 @@ import java.util.List;
 
 import sang.com.freerecycleview.adapter.XAdapter;
 import sang.com.freerecycleview.holder.BaseHolder;
+import sang.com.freerecycleview.view.SpringRecycleView;
 
 public class MainActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
+    SpringRecycleView recyclerView;
     private Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +31,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        recyclerView = (RecyclerView) findViewById(R.id.rv);
+        recyclerView = (SpringRecycleView) findViewById(R.id.rv);
         LinearLayoutManager manager =new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
         List<String> list =new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 50; i++) {
             list.add(getString(R.string.app_name)+i);
         }
 

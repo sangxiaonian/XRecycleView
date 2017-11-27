@@ -1,30 +1,44 @@
 package sang.com.freerecycleview.view;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
 
+import sang.com.freerecycleview.RecycleControl;
+import sang.com.freerecycleview.config.FRConfig;
 import sang.com.freerecycleview.utils.FRLog;
-import sang.com.freerecycleview.utils.FRToast;
+
+import static android.R.attr.x;
 
 
 /**
  * 作者： ${PING} on 2017/11/21.
  */
 
-public class BaseRecycleView extends RecyclerView {
+public abstract class BaseRecycleView extends RecyclerView {
+
+    private float currentY;
+    private long currentTimeMillis;
 
 
-    private int heardHeight;
+    private PointF touchPoint;//手指按下位置
+
     protected int ORIENTATION = -1;//滑动方向 1 y方向 0位x
     protected boolean TOP; //滑动到顶部
     protected boolean BOOTOM;//滑动到底
-    private long currentTimeMillis;
     private float speed;//速度
+
+    protected RecycleControl.OnFlingScrollToPeakListener flingListener;
+    private int mTouchSlop;
+
 
     public BaseRecycleView(Context context) {
         super(context);
@@ -42,16 +56,71 @@ public class BaseRecycleView extends RecyclerView {
         initView(context);
     }
 
-    private void initView(Context context) {
-        setOverScrollMode(OVER_SCROLL_ALWAYS);
+    protected void initView(Context context) {
+        setOverScrollMode(OVER_SCROLL_NEVER);
+        touchPoint = new PointF();
+        final ViewConfiguration vc = ViewConfiguration.get(context);
+        mTouchSlop = vc.getScaledTouchSlop();
+    }
+
+
+    /**
+     * 添加滑动到两端时候的速度监听
+     *
+     * @param flingListener
+     */
+    public void setOnFlingScrollToPeakListener(RecycleControl.OnFlingScrollToPeakListener flingListener) {
+        this.flingListener = flingListener;
     }
 
     @Override
     public void onScrollStateChanged(int state) {
         super.onScrollStateChanged(state);
-        FRLog.d(getOverScrollMode() + "-----------onScrollStateChanged-----------" + state);
+
+        //正在拖动或者惯性滑动时候,如果时间过短,没有完成测速,来计算速度
+        if (speed == 0 && currentTimeMillis != 0 && state == SCROLL_STATE_IDLE) {
+            speed = (getscroll() - currentY) * 1000 / (System.currentTimeMillis() - currentTimeMillis);
+        }
 
 
+//        if (Math.abs(speed) > FRConfig.MINSPEED && state == SCROLL_STATE_IDLE) {
+        if (state == SCROLL_STATE_IDLE) {
+            if (TOP && speed < 0) {
+                if (flingListener == null||flingListener.onFlingScrollToTop(speed)) {
+                    flingScrollToTop(speed);
+                }
+            }
+
+            if (BOOTOM && speed > 0) {
+                if (flingListener == null||flingListener.onFlingScrollToTop(speed)) {
+                    flingScrollToBootom(speed);
+                }
+            }
+        }
+
+        if (state == SCROLL_STATE_IDLE) {
+            currentTimeMillis = 0;
+            currentY = 0;
+            speed = 0;
+        }
+    }
+
+    /**
+     * 惯性滑动到底部
+     * @param speed
+     */
+    protected abstract void flingScrollToBootom(float speed);
+
+    /**
+     * 惯性滑动到顶部
+     * @param speed
+     */
+    protected abstract void flingScrollToTop(float speed);
+
+
+    @Override
+    public void onScrolled(int dx, int dy) {
+        super.onScrolled(dx, dy);
         if (ORIENTATION == 1) {
             TOP = !canScrollVertically(-1);
             BOOTOM = !canScrollVertically(1) && !TOP;
@@ -60,103 +129,103 @@ public class BaseRecycleView extends RecyclerView {
             BOOTOM = !canScrollHorizontally(1) && !TOP;
         }
 
-
-        if (TOP && speed < 0) {
-            FRToast.showTextToast(getContext(), "到顶了");
-            FRLog.i("到顶了:>>" + state);
-        }
-
-        if (BOOTOM && speed > 0) {
-            FRToast.showTextToast(getContext(), "到底部了");
-            FRLog.i("到底部了:>>" + state);
-        }
-
-        if (state == SCROLL_STATE_IDLE) {
-            currentTimeMillis = 0;
-            currentY = 0;
-        }
-
-    }
-
-    private float currentY;
-
-    @Override
-    public void onScrolled(int dx, int dy) {
-        super.onScrolled(dx, dy);
-
         if (currentTimeMillis == 0) {
             currentTimeMillis = System.currentTimeMillis();
             currentY = getscroll();
         } else {
             long timegap = System.currentTimeMillis() - currentTimeMillis;
             if (timegap >= 100) {
-                FRLog.i(getscroll() + ">>>" + currentY);
-                speed = (getscroll() - currentY) / timegap;
+                speed = (getscroll() - currentY) * 1000 / timegap;
                 currentTimeMillis = System.currentTimeMillis();
                 currentY = getscroll();
 
             }
         }
-
     }
+
 
     /**
      * 获取滑动距离
+     *
      * @return
      */
     public float getscroll() {
-        if (ORIENTATION==LinearLayoutManager.VERTICAL){
+        if (ORIENTATION == LinearLayoutManager.VERTICAL) {
             return computeVerticalScrollOffset();
-        }else {
+        } else {
             return computeHorizontalScrollOffset();
         }
     }
 
-    public float getscr() {
-        return super.getScaleY();
-    }
-
-    @Override
-    public void setAdapter(Adapter adapter) {
-        super.setAdapter(adapter);
-
-    }
-
-    private float downY;
-
     @Override
     public boolean onTouchEvent(MotionEvent e) {
 
-        if (downY == 0) {
-            downY = e.getY();
+        if (touchPoint.x == 0 && touchPoint.y == 0) {
+                touchPoint.y = e.getRawY();
+                touchPoint.x = e.getRawY();
+                onStarteDrag();
+
         }
+        FRLog.d("ACTIOM: " + e.getAction());
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                downY = e.getY();
+                if (TOP||BOOTOM) {
+                    touchPoint.y = e.getRawY();
+                    touchPoint.x = e.getRawX();
+                    onStarteDrag();
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (canDrag()) {
-                    float v = e.getY() - downY;
-
+                final float x = e.getRawX();
+                final float y = e.getRawY();
+                final float dragX = x - touchPoint.x;
+                final float dragY = y - touchPoint.y;
+                if (canDrag(dragX, dragY)) {
+                    onDrag(dragX, dragY);
                 }
-                downY = e.getY();
-                break;
+                touchPoint.y = y;
+                touchPoint.x = x;
+                if (canDrag(dragX,dragY)){
+                    return true;
+                }
+                    break;
             case MotionEvent.ACTION_UP:
-                downY = 0;
+            case MotionEvent.ACTION_CANCEL:
+                touchPoint.y = 0;
+                touchPoint.x = 0;
+                onCancleDrag();
                 break;
-
         }
-
-
         return super.onTouchEvent(e);
 
     }
 
-    private boolean canDrag() {
-        if (currentY == 0) {
-            return true;
-        }
+    /**
+     * 取消拖拽
+     */
+    protected abstract void onCancleDrag();
 
+    /**
+     * 开始拖拽
+     */
+    protected abstract void onStarteDrag();
+
+    /**
+     * 正在拖拽
+     *
+     * @param dragX
+     * @param dragY
+     */
+    protected abstract void onDrag(float dragX, float dragY);
+
+    /**
+     * 判断当前是否可以拖拽
+     *
+     * @param x 此时x位置move
+     * @param y 此时y位置move
+     * @return
+     */
+    protected boolean canDrag(float x, float y) {
         return false;
     }
 
