@@ -126,7 +126,12 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
-        if (viewType >= HEADTYPE && viewType < FOOTTYPE) {
+
+        if (viewType == TOPREFRUSH) {
+            return topRefrush;
+        } else if (viewType == FOOTREFRUSH) {
+            return footRefrush;
+        } else if (viewType >= HEADTYPE && viewType < FOOTTYPE) {
             return heads.get(viewType - HEADTYPE);
         } else if (viewType >= FOOTTYPE) {
             return foots.get(viewType - FOOTTYPE);
@@ -145,7 +150,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
         } else if (viewType == FOOTREFRUSH) {
             footRefrush.initView(position);
         } else {
-            if (hasTopRefrush()&&position>topRefrushPositin){
+            if (hasTopRefrush() && position > topRefrushPositin) {
                 position--;
             }
             if (viewType >= HEADTYPE) {//脚布局
@@ -166,7 +171,15 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return list.size() + heads.size() + foots.size();
+
+        int itemCount = list.size() + heads.size() + foots.size();
+        if (hasTopRefrush()) {
+            itemCount++;
+        }
+        if (hasFootRefrush()) {
+            itemCount++;
+        }
+        return itemCount;
     }
 
     /**

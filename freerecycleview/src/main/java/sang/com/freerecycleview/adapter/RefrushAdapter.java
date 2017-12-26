@@ -23,33 +23,4 @@ public abstract class RefrushAdapter<T> extends BaseAdapter<T> {
         footRefrush = new TopRefrushHolder(context, R.layout.item_bottom);
         topRefrushPositin=0;
     }
-
-    @Override
-    public int getItemCount() {
-        int itemCount = super.getItemCount();
-        if (hasTopRefrush()) {
-            itemCount++;
-        }
-        if (hasFootRefrush()) {
-            itemCount++;
-        }
-        return itemCount;
-    }
-
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
-        if (viewType == TOPREFRUSH) {
-            return topRefrush;
-        } else if (viewType == FOOTREFRUSH) {
-            return footRefrush;
-        } else {
-            return super.onCreateViewHolder(parent, viewType);
-        }
-    }
-
-
-
-
-
 }
