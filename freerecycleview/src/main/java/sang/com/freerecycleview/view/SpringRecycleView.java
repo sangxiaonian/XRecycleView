@@ -110,7 +110,6 @@ public class SpringRecycleView extends BaseRecycleView {
      */
     @Override
     protected void onStarteDrag() {
-        animate().cancel();
         fling.cancel();
     }
 

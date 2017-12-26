@@ -15,19 +15,7 @@ public class TopRefrushHolder<T> extends PeakHolder<T> {
         super(itemView);
     }
 
-    public TopRefrushHolder(Context context) {
-        this(new View(context));
-        ViewGroup.LayoutParams params = itemView.getLayoutParams();
-        if (params==null){
-            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
-        }else {
-            params.height=0;
-        }
-        itemView.setLayoutParams(params);
-
+    public TopRefrushHolder(Context context, int layoutID) {
+        super(context, layoutID);
     }
-
-
-
-
 }

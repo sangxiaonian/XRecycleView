@@ -76,14 +76,10 @@ public abstract class BaseRecycleView extends RecyclerView {
     @Override
     public void onScrollStateChanged(int state) {
         super.onScrollStateChanged(state);
-
         //正在拖动或者惯性滑动时候,如果时间过短,没有完成测速,来计算速度
         if (speed == 0 && currentTimeMillis != 0 && state == SCROLL_STATE_IDLE) {
             speed = (getscroll() - currentY) * 1000 / (System.currentTimeMillis() - currentTimeMillis);
         }
-
-
-//        if (Math.abs(speed) > FRConfig.MINSPEED && state == SCROLL_STATE_IDLE) {
         if (state == SCROLL_STATE_IDLE) {
             if (TOP && speed < 0) {
                 if (flingListener == null||flingListener.onFlingScrollToTop(speed)) {
@@ -159,12 +155,10 @@ public abstract class BaseRecycleView extends RecyclerView {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-
         if (touchPoint.x == 0 && touchPoint.y == 0) {
                 touchPoint.y = e.getRawY();
                 touchPoint.x = e.getRawY();
                 onStarteDrag();
-
         }
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:

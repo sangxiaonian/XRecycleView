@@ -1,6 +1,8 @@
 package sang.com.freerecycleview.holder;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 
 /**
@@ -18,6 +20,10 @@ public class PeakHolder<T> extends RecyclerView.ViewHolder {
     public PeakHolder(View itemView) {
         super(itemView);
         this.itemView = itemView;
+    }
+    public PeakHolder(Context context,int layoutID) {
+        this(LayoutInflater.from(context).inflate(layoutID,null));
+
     }
 
     /**

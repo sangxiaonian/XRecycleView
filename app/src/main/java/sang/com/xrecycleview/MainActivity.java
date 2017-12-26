@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import sang.com.freerecycleview.adapter.RefrushAdapter;
 import sang.com.freerecycleview.adapter.XAdapter;
 import sang.com.freerecycleview.holder.BaseHolder;
 import sang.com.freerecycleview.view.SpringRecycleView;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             list.add(getString(R.string.app_name)+i);
         }
 
-        recyclerView.setAdapter(new XAdapter<String>(this,list) {
+        recyclerView.setAdapter(new RefrushAdapter<String>(this,list) {
             @Override
             protected BaseHolder initHolder(ViewGroup parent, int viewType) {
                 return new BaseHolder<String>(parent,mContext,R.layout.item_textview){
