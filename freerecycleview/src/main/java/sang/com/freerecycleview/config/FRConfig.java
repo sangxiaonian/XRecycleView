@@ -1,7 +1,5 @@
 package sang.com.freerecycleview.config;
 
-import sang.com.freerecycleview.utils.DeviceUtils;
-
 /**
  * 作者： ${PING} on 2017/11/24.
  */
@@ -13,5 +11,8 @@ public class FRConfig {
      */
     public static final int MINSPEED = 1000;
 
-    public static float SPRINGHEIGHT = 50;
+    /**
+     * 标准高度
+     */
+    public static float SPRINGHEIGHT = 250;
 }

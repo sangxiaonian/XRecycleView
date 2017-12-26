@@ -166,7 +166,6 @@ public abstract class BaseRecycleView extends RecyclerView {
                 onStarteDrag();
 
         }
-        FRLog.d("ACTIOM: " + e.getAction());
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (TOP||BOOTOM) {
