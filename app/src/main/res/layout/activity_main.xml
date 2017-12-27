@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="sang.com.xrecycleview.MainActivity">
 
-   <sang.com.freerecycleview.view.SpringRecycleView
+   <sang.com.freerecycleview.view.RefrushRecycleView
        android:layout_width="match_parent"
        android:id="@+id/rv"
        android:layout_height="match_parent"/>

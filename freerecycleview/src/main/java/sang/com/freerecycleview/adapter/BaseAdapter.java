@@ -41,6 +41,29 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
         foots = new ArrayList<>();
     }
 
+    public int getTopRefrushPositin() {
+        return topRefrushPositin;
+    }
+
+    public void setTopRefrushPositin(int topRefrushPositin) {
+        this.topRefrushPositin = topRefrushPositin;
+    }
+
+    public TopRefrushHolder getTopRefrush() {
+        return topRefrush;
+    }
+
+    public void setTopRefrush(TopRefrushHolder topRefrush) {
+        this.topRefrush = topRefrush;
+    }
+
+    public TopRefrushHolder getFootRefrush() {
+        return footRefrush;
+    }
+
+    public void setFootRefrush(TopRefrushHolder footRefrush) {
+        this.footRefrush = footRefrush;
+    }
 
     public void addHeard(PeakHolder heardHolder) {
         heads.add(heardHolder);

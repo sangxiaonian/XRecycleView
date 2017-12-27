@@ -1,6 +1,7 @@
 package sang.com.xrecycleview;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,11 +16,12 @@ import java.util.List;
 import sang.com.freerecycleview.adapter.RefrushAdapter;
 import sang.com.freerecycleview.adapter.XAdapter;
 import sang.com.freerecycleview.holder.BaseHolder;
+import sang.com.freerecycleview.view.RefrushRecycleView;
 import sang.com.freerecycleview.view.SpringRecycleView;
 
 public class MainActivity extends AppCompatActivity {
 
-    SpringRecycleView recyclerView;
+    RefrushRecycleView recyclerView;
     private Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        recyclerView = (SpringRecycleView) findViewById(R.id.rv);
+        recyclerView = (RefrushRecycleView) findViewById(R.id.rv);
         LinearLayoutManager manager =new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
@@ -50,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
                         super.initView(itemView, position, data);
                         TextView textView=itemView.findViewById(R.id.item_text);
                         textView.setText(data);
+                        if (position%2==1) {
+                            itemView.setBackgroundColor(Color.parseColor("#abcdef"));
+                        }else {
+                            itemView.setBackgroundColor(Color.parseColor("#fedcba"));
+
+                        }
                     }
                 };
             }

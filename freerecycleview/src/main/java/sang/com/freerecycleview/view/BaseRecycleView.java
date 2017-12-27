@@ -117,7 +117,10 @@ public abstract class BaseRecycleView extends RecyclerView {
     @Override
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
-        if (ORIENTATION == 1) {
+
+        FRLog.d(isVertical()+">>>"+TOP+">>"+!canScrollVertically(1)+">>"+getscroll());
+
+        if (isVertical()) {
             TOP = !canScrollVertically(-1);
             BOOTOM = !canScrollVertically(1) && !TOP;
         } else {
@@ -153,6 +156,10 @@ public abstract class BaseRecycleView extends RecyclerView {
         }
     }
 
+    protected boolean isVertical(){
+        return ORIENTATION == LinearLayoutManager.VERTICAL;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         if (touchPoint.x == 0 && touchPoint.y == 0) {
@@ -178,7 +185,7 @@ public abstract class BaseRecycleView extends RecyclerView {
                 }
                 touchPoint.y = y;
                 touchPoint.x = x;
-                if (canDrag(dragX,dragY)){
+                if (canDrag(dragX,dragY)&&(!BOOTOM)){
                     return true;
                 }
                     break;
