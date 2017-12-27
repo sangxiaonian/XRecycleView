@@ -77,16 +77,19 @@ public class RefrushRecycleView extends BaseRecycleView {
         if (Math.abs(speed) < 1000) {
             return;
         }
-        if (true) {
-            return;
-        }
-        float friction = Math.abs(speed / 10000);
-        friction = friction > 1 ? 1 : friction;
+        float friction = Math.abs(speed / 2000);
+        friction = friction > 5 ? 5 : friction;
         int value = 1;
-        if (speed > 0) {
-            value = -1;
-        }
 
+        if (TOP) {
+            if (!topFling.isRunning()) {
+                topFling.animateToFinalPosition(topStandHeight * friction * value);
+            }
+        } else if (BOOTOM) {
+            if (!footFling.isRunning()) {
+                footFling.animateToFinalPosition(footStandHeight * friction * value);
+            }
+        }
     }
 
     /**
@@ -94,11 +97,9 @@ public class RefrushRecycleView extends BaseRecycleView {
      */
     @Override
     protected void onCancleDrag() {
-        if (TOP){
+        if (TOP) {
             topFling.animateToFinalPosition(0);
-        }
-
-        if (BOOTOM){
+        } else if (BOOTOM) {
             footFling.animateToFinalPosition(0);
         }
     }
@@ -213,7 +214,7 @@ public class RefrushRecycleView extends BaseRecycleView {
 
 
     @Override
-    public void setAdapter(Adapter adapter) {
+    public void setAdapter(final Adapter adapter) {
         if (adapter instanceof RefrushAdapter) {
             TopRefrushHolder topRefrush = ((RefrushAdapter) adapter).getTopRefrush();
             final TopRefrushHolder footRefrush = ((RefrushAdapter) adapter).getFootRefrush();
@@ -230,12 +231,23 @@ public class RefrushRecycleView extends BaseRecycleView {
                     } else {
                         topStandHeight = topView.getMeasuredWidth();
                     }
-                    footStandHeight=topStandHeight;
+                    footStandHeight = topStandHeight;
                     changeViewHeight(0, topView);
                     changeViewHeight(0, footView);
                     topFling = new AnimotionUtils(isVertical()).creatAnimotion(topView);
+                    topFling.animateToFinalPosition(0);
+                    topFling.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
+                    topFling.start();
                     footFling = new AnimotionUtils(isVertical()).creatAnimotion(footView);
-
+                    footFling.addUpdateListener(new DynamicAnimation.OnAnimationUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(DynamicAnimation animation, float value, float velocity) {
+                            scrollToPosition(adapter.getItemCount() - 1);
+                        }
+                    });
+                    footFling.animateToFinalPosition(0);
+                    footFling.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
+                    footFling.start();
                 }
             });
 
@@ -251,7 +263,7 @@ public class RefrushRecycleView extends BaseRecycleView {
         if (direction < 0) {
             return offset > topStandHeight;
         } else {
-            return offset < range -topStandHeight - 1;
+            return offset < range - topStandHeight - 1;
         }
     }
 

@@ -118,7 +118,6 @@ public abstract class BaseRecycleView extends RecyclerView {
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
 
-        FRLog.d(isVertical()+">>>"+TOP+">>"+!canScrollVertically(1)+">>"+getscroll());
 
         if (isVertical()) {
             TOP = !canScrollVertically(-1);

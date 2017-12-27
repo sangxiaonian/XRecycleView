@@ -85,7 +85,6 @@ public class SpringRecycleView extends BaseRecycleView {
         fling.addEndListener(new DynamicAnimation.OnAnimationEndListener() {
             @Override
             public void onAnimationEnd(DynamicAnimation animation, boolean canceled, float value, float velocity) {
-                FRLog.d(value+">>"+velocity);
                 if (value!=0) {
                     fling.animateToFinalPosition(0);
                     fling.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);

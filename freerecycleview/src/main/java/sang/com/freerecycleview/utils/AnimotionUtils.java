@@ -1,5 +1,6 @@
 package sang.com.freerecycleview.utils;
 
+import android.support.animation.DynamicAnimation;
 import android.support.animation.FloatPropertyCompat;
 import android.support.animation.SpringAnimation;
 import android.support.animation.SpringForce;
@@ -15,6 +16,8 @@ import static android.R.attr.value;
 public class AnimotionUtils extends FloatPropertyCompat<View> {
 
 
+    private SpringAnimation fling;
+
     public AnimotionUtils(String name) {
         super(name);
     }
@@ -27,13 +30,22 @@ public class AnimotionUtils extends FloatPropertyCompat<View> {
     }
 
     public SpringAnimation creatAnimotion(View view) {
-        SpringAnimation stretchAnimation = new SpringAnimation(view, this);
-        stretchAnimation.animateToFinalPosition(0);
-        stretchAnimation.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
-        stretchAnimation.start();
-        return stretchAnimation;
+        fling = new SpringAnimation(view, this);
+
+        fling.addEndListener(new DynamicAnimation.OnAnimationEndListener() {
+            @Override
+            public void onAnimationEnd(DynamicAnimation animation, boolean canceled, float value, float velocity) {
+                if (value != 0) {
+                    fling.animateToFinalPosition(0);
+                }
+            }
+        });
+        return fling;
     }
 
+    public void   start( DynamicAnimation.OnAnimationUpdateListener listener) {
+        fling .addUpdateListener(listener);
+    }
     @Override
     public float getValue(View view) {
         //返回当前属性值
@@ -56,7 +68,6 @@ public class AnimotionUtils extends FloatPropertyCompat<View> {
                 params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, currentHeight);
             } else {
                 params = new ViewGroup.LayoutParams(currentHeight, ViewGroup.LayoutParams.MATCH_PARENT);
-
             }
         } else {
             if (isVertical) {
