@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sang.com.freerecycleview.holder.BaseHolder;
+import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.PeakHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
 
@@ -31,7 +32,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
     protected final int FOOTREFRUSH = 200002;//底部刷新
     protected int topRefrushPositin = -1;//头部刷新位置
     protected TopRefrushHolder topRefrush;//头部刷新
-    protected TopRefrushHolder footRefrush;//底部刷新
+    protected FootRefrushHolder footRefrush;//底部刷新
 
 
     public BaseAdapter(Context context, List<T> list) {
@@ -57,11 +58,11 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
         this.topRefrush = topRefrush;
     }
 
-    public TopRefrushHolder getFootRefrush() {
+    public FootRefrushHolder getFootRefrush() {
         return footRefrush;
     }
 
-    public void setFootRefrush(TopRefrushHolder footRefrush) {
+    public void setFootRefrush(FootRefrushHolder footRefrush) {
         this.footRefrush = footRefrush;
     }
 

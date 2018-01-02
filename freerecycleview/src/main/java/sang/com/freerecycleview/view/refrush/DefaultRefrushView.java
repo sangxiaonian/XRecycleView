@@ -17,7 +17,7 @@ import sang.com.freerecycleview.utils.DeviceUtils;
  * 默认情况下的刷新控件
  */
 
-public class DefaultRefrushView extends View {
+public class DefaultRefrushView extends BaseView {
 
 
     private int mWidth;
@@ -43,8 +43,11 @@ public class DefaultRefrushView extends View {
         initView(context, attrs);
     }
 
-    private void initView(Context context, AttributeSet attrs) {
 
+
+    @Override
+    protected void initView(Context context, AttributeSet attrs) {
+        super.initView(context, attrs);
 
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStrokeWidth(1);

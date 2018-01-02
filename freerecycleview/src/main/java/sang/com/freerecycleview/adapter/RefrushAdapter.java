@@ -1,13 +1,16 @@
 package sang.com.freerecycleview.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import java.util.List;
 
 import sang.com.freerecycleview.R;
+import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
+import sang.com.freerecycleview.view.refrush.DefaultRefrushView;
 
 
 /**
@@ -19,8 +22,23 @@ public abstract class RefrushAdapter<T> extends BaseAdapter<T> {
 
     public RefrushAdapter(Context context, List<T> list) {
         super(context, list);
-        topRefrush = new TopRefrushHolder(context, R.layout.item_bottom);
-        footRefrush = new TopRefrushHolder(context, R.layout.item_bottom);
-        topRefrushPositin=0;
+        topRefrush = new TopRefrushHolder(getDefaultRefrushView(context));
+        footRefrush = new FootRefrushHolder(getDefaultRefrushView(context));
+        topRefrushPositin = 2;
+    }
+
+
+    private DefaultRefrushView getDefaultRefrushView(Context context) {
+        DefaultRefrushView refrushView = new DefaultRefrushView(context);
+        ViewGroup.LayoutParams params = refrushView.getLayoutParams();
+        if (params == null) {
+            params = new ViewGroup.LayoutParams(100, 100);
+        } else {
+            params.height = 100;
+            params.width = 100;
+        }
+
+        refrushView.setLayoutParams(params);
+        return refrushView;
     }
 }

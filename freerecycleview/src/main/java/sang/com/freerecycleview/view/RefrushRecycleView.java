@@ -1,21 +1,15 @@
 package sang.com.freerecycleview.view;
 
 import android.content.Context;
-import android.support.animation.DynamicAnimation;
-import android.support.animation.SpringAnimation;
-import android.support.animation.SpringForce;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.Scroller;
 
 import sang.com.freerecycleview.adapter.RefrushAdapter;
+import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
-import sang.com.freerecycleview.utils.AnimotionUtils;
-import sang.com.freerecycleview.utils.FRLog;
+import sang.com.freerecycleview.view.refrush.BaseView;
 
 
 /**
@@ -25,13 +19,9 @@ import sang.com.freerecycleview.utils.FRLog;
 
 public class RefrushRecycleView extends BaseRecycleView {
 
-    Scroller mScroller;
-    private View topView;
-    private View footView;
-    private int topStandHeight;//顶部标准高度
-    private int footStandHeight;//底部标准高度
-    private SpringAnimation topFling;
-    private SpringAnimation footFling;
+    private BaseView topView;
+    private BaseView footView;
+
 
 
     public RefrushRecycleView(Context context) {
@@ -49,10 +39,7 @@ public class RefrushRecycleView extends BaseRecycleView {
     @Override
     protected void initView(Context context) {
         super.initView(context);
-        mScroller = new Scroller(context, new DecelerateInterpolator());
-
     }
-
     /**
      * 惯性滑动到底部
      *
@@ -61,6 +48,7 @@ public class RefrushRecycleView extends BaseRecycleView {
     @Override
     protected void flingScrollToBootom(float speed) {
         overFling(speed);
+        scrollToPosition(getAdapter().getItemCount()-1);
     }
 
     /**
@@ -77,18 +65,11 @@ public class RefrushRecycleView extends BaseRecycleView {
         if (Math.abs(speed) < 1000) {
             return;
         }
-        float friction = Math.abs(speed / 2000);
-        friction = friction > 5 ? 5 : friction;
-        int value = 1;
-
         if (TOP) {
-            if (!topFling.isRunning()) {
-                topFling.animateToFinalPosition(topStandHeight * friction * value);
-            }
+            topView.overFling(speed);
         } else if (BOOTOM) {
-            if (!footFling.isRunning()) {
-                footFling.animateToFinalPosition(footStandHeight * friction * value);
-            }
+
+            footView.overFling(speed);
         }
     }
 
@@ -98,9 +79,9 @@ public class RefrushRecycleView extends BaseRecycleView {
     @Override
     protected void onCancleDrag() {
         if (TOP) {
-            topFling.animateToFinalPosition(0);
+            topView.onCancleDrag();
         } else if (BOOTOM) {
-            footFling.animateToFinalPosition(0);
+            footView.onCancleDrag();
         }
     }
 
@@ -109,39 +90,17 @@ public class RefrushRecycleView extends BaseRecycleView {
      */
     @Override
     protected void onStarteDrag() {
-
+        topView.cancle();
+        footView.cancle();
     }
 
     @Override
     protected void onDrag(float dragX, float dragY) {
-        float current = 0;
-        float drag = 0;
-        float v = 1;
         if (TOP) {
-            if (isVertical()) {
-                current = topView.getMeasuredHeight();
-                drag = dragY;
-            } else {
-                current = topView.getMeasuredWidth();
-                drag = dragX;
-            }
-            v = Math.abs(current / topStandHeight);
+            topView.onDrag(dragX, dragY);
         } else if (BOOTOM) {
-            if (isVertical()) {
-                current = footView.getMeasuredHeight();
-                drag = -dragY;
-            } else {
-                current = footView.getMeasuredWidth();
-                drag = -dragX;
-            }
-            v = Math.abs(current / footStandHeight);
+            footView.onDrag(dragX, dragY);
         }
-        v = v < 1 ? 1 : v;
-        if (Math.abs(current) > Math.abs(current + drag)) {
-            v = 1;
-        }
-        changeHeight(current + drag / v);
-
     }
 
     @Override
@@ -176,19 +135,6 @@ public class RefrushRecycleView extends BaseRecycleView {
         return candrag;
     }
 
-    private void changeHeight(float currentHeight) {
-        View view = topView;
-        if (TOP) {
-            view = topView;
-        } else if (BOOTOM) {
-            view = footView;
-        }
-
-        if (view == null) {
-            return;
-        }
-        changeViewHeight((int) currentHeight, view);
-    }
 
     private void changeViewHeight(int currentHeight, View view) {
         if (currentHeight < 0) {
@@ -217,39 +163,15 @@ public class RefrushRecycleView extends BaseRecycleView {
     public void setAdapter(final Adapter adapter) {
         if (adapter instanceof RefrushAdapter) {
             TopRefrushHolder topRefrush = ((RefrushAdapter) adapter).getTopRefrush();
-            final TopRefrushHolder footRefrush = ((RefrushAdapter) adapter).getFootRefrush();
+            final FootRefrushHolder footRefrush = ((RefrushAdapter) adapter).getFootRefrush();
 
-            topView = topRefrush.getItemView();
-            footView = footRefrush.getItemView();
+            topView = (BaseView) topRefrush.getItemView();
+            footView = (BaseView) footRefrush.getItemView();
+            if (footView!=null){
+                footView.setParentView(this);
+            }
 
-            topView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    topView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    if (isVertical()) {
-                        topStandHeight = topView.getMeasuredHeight();
-                    } else {
-                        topStandHeight = topView.getMeasuredWidth();
-                    }
-                    footStandHeight = topStandHeight;
-                    changeViewHeight(0, topView);
-                    changeViewHeight(0, footView);
-                    topFling = new AnimotionUtils(isVertical()).creatAnimotion(topView);
-                    topFling.animateToFinalPosition(0);
-                    topFling.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
-                    topFling.start();
-                    footFling = new AnimotionUtils(isVertical()).creatAnimotion(footView);
-                    footFling.addUpdateListener(new DynamicAnimation.OnAnimationUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(DynamicAnimation animation, float value, float velocity) {
-                            scrollToPosition(adapter.getItemCount() - 1);
-                        }
-                    });
-                    footFling.animateToFinalPosition(0);
-                    footFling.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
-                    footFling.start();
-                }
-            });
+
 
         }
         super.setAdapter(adapter);
@@ -261,9 +183,9 @@ public class RefrushRecycleView extends BaseRecycleView {
         final int range = computeVerticalScrollRange() - computeVerticalScrollExtent();
         if (range == 0) return false;
         if (direction < 0) {
-            return offset > topStandHeight;
+            return offset > topView.getStandSize();
         } else {
-            return offset < range - topStandHeight - 1;
+            return offset < range - topView.getStandSize() - 1;
         }
     }
 
