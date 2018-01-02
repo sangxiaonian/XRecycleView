@@ -54,6 +54,11 @@ public class ShapFactory {
      * @return 一个向下的箭头
      */
     public Bitmap creatArrows(int mWidth, int mHeight, int den) {
+
+        if (mWidth<=0||mHeight<=0){
+            return null;
+        }
+
         Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
         mPath.reset();
@@ -93,6 +98,10 @@ public class ShapFactory {
      * @return 一个四方形的Bitmap
      */
     public Bitmap creatShap(int mWidth, int mHeight) {
+        if (mWidth<=0||mHeight<=0){
+            return null;
+        }
+
         Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
         mPath.reset();

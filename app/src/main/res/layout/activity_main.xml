@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="sang.com.xrecycleview.MainActivity">
 
-   <sang.com.freerecycleview.view.RefrushRecycleView
-       android:layout_width="match_parent"
-       android:id="@+id/rv"
-       android:layout_height="match_parent"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-</RelativeLayout>
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/bt_refrush"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="刷新完成" />
+
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/bt_load"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="加载完成" />
+    </LinearLayout>
+
+
+    <sang.com.freerecycleview.view.RefrushRecycleView
+        android:id="@+id/rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -19,9 +20,11 @@ import sang.com.freerecycleview.holder.BaseHolder;
 import sang.com.freerecycleview.view.RefrushRecycleView;
 import sang.com.freerecycleview.view.SpringRecycleView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     RefrushRecycleView recyclerView;
+    Button btRefrush;
+    Button btLoadMore;
     private Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         recyclerView = (RefrushRecycleView) findViewById(R.id.rv);
+        btLoadMore=findViewById(R.id.bt_load);
+        btRefrush=findViewById(R.id.bt_refrush);
+
+        btRefrush.setOnClickListener(this);
+        btLoadMore.setOnClickListener(this);
+
         LinearLayoutManager manager =new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
@@ -63,5 +72,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.bt_load:
+                recyclerView.loadMore(true);
+                break;
+            case R.id.bt_refrush:
+                recyclerView.refrushSuccess(true);
+                break;
+        }
     }
 }

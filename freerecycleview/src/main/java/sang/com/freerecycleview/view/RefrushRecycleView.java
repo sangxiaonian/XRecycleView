@@ -1,6 +1,8 @@
 package sang.com.freerecycleview.view;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -10,6 +12,9 @@ import sang.com.freerecycleview.adapter.RefrushAdapter;
 import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
 import sang.com.freerecycleview.view.refrush.BaseView;
+import sang.com.freerecycleview.view.refrush.RefrushView;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 
 /**
@@ -19,9 +24,24 @@ import sang.com.freerecycleview.view.refrush.BaseView;
 
 public class RefrushRecycleView extends BaseRecycleView {
 
-    private BaseView topView;
-    private BaseView footView;
+    private static final int REFRUSH = 1;
+    private static final int LOADMORE = 2;
+    private RefrushView topView;
+    private RefrushView footView;
 
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (msg.what == REFRUSH) {//下拉刷新
+                refrushSuccess((Boolean) msg.obj);
+            } else if (msg.what == LOADMORE) {//上拉加载
+                loadMore((Boolean) msg.obj);
+            }
+
+        }
+    };
 
 
     public RefrushRecycleView(Context context) {
@@ -40,6 +60,7 @@ public class RefrushRecycleView extends BaseRecycleView {
     protected void initView(Context context) {
         super.initView(context);
     }
+
     /**
      * 惯性滑动到底部
      *
@@ -48,7 +69,7 @@ public class RefrushRecycleView extends BaseRecycleView {
     @Override
     protected void flingScrollToBootom(float speed) {
         overFling(speed);
-        scrollToPosition(getAdapter().getItemCount()-1);
+        scrollToPosition(getAdapter().getItemCount() - 1);
     }
 
     /**
@@ -90,8 +111,9 @@ public class RefrushRecycleView extends BaseRecycleView {
      */
     @Override
     protected void onStarteDrag() {
-        topView.cancle();
-        footView.cancle();
+
+        topView.startDrag();
+        footView.startDrag();
     }
 
     @Override
@@ -107,26 +129,16 @@ public class RefrushRecycleView extends BaseRecycleView {
     protected boolean canDrag(float x, float y) {
         boolean candrag = false;
         if (TOP) {//顶层
-            float translation = 0;
-            if (isVertical()) {//垂直方向
-                translation = topView.getMeasuredHeight();
-            } else {
-                translation = topView.getMeasuredWidth();
-            }
-            if (translation == 0) {
+            float translation = topView.getViewSize();
+            if (translation == 0 || translation == topView.getStandSize()) {
                 candrag = y > 0;
             } else if (translation > 0) {
                 candrag = true;
             }
 
         } else if (BOOTOM) {
-            float translation = 0;
-            if (isVertical()) {//横向
-                translation = footView.getMeasuredHeight();
-            } else {
-                translation = footView.getMeasuredWidth();
-            }
-            if (translation == 0) {
+            float translation = footView.getViewSize();
+            if (translation == 0 || translation == footView.getStandSize()) {
                 candrag = y < 0;
             } else if (translation > 0) {
                 candrag = true;
@@ -136,48 +148,27 @@ public class RefrushRecycleView extends BaseRecycleView {
     }
 
 
-    private void changeViewHeight(int currentHeight, View view) {
-        if (currentHeight < 0) {
-            currentHeight = 0;
-        }
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        if (params == null) {
-            if (isVertical()) {
-                params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, currentHeight);
-            } else {
-                params = new ViewGroup.LayoutParams(currentHeight, ViewGroup.LayoutParams.MATCH_PARENT);
-
-            }
-        } else {
-            if (isVertical()) {
-                params.height = currentHeight;
-            } else {
-                params.width = currentHeight;
-            }
-        }
-        view.setLayoutParams(params);
-    }
-
 
     @Override
     public void setAdapter(final Adapter adapter) {
         if (adapter instanceof RefrushAdapter) {
             TopRefrushHolder topRefrush = ((RefrushAdapter) adapter).getTopRefrush();
             final FootRefrushHolder footRefrush = ((RefrushAdapter) adapter).getFootRefrush();
-
-            topView = (BaseView) topRefrush.getItemView();
-            footView = (BaseView) footRefrush.getItemView();
+            topView = (RefrushView) topRefrush.getItemView();
+            footView = (RefrushView) footRefrush.getItemView();
             if (footView!=null){
-                footView.setParentView(this);
+                footView.attachRecycleView(this);
             }
-
-
-
         }
         super.setAdapter(adapter);
 
     }
 
+    /**
+     * 是否可以滑动
+     * @param direction
+     * @return
+     */
     public boolean canScrollVertically(int direction) {
         final int offset = computeVerticalScrollOffset();
         final int range = computeVerticalScrollRange() - computeVerticalScrollExtent();
@@ -190,4 +181,90 @@ public class RefrushRecycleView extends BaseRecycleView {
     }
 
 
+    /**
+     * 是否刷新成功
+     *
+     * @param isSuccess true 刷新成功 false 刷新失败
+     */
+    public void refrushSuccess(boolean isSuccess) {
+        if (topView != null) {
+            if (isSuccess){
+                topView.refrushSuccess();
+            }else {
+                topView.refrushfail();
+            }
+        }
+    }
+
+
+    /**
+     * 是否刷新成功
+     *
+     * @param isSuccess true 刷新成功 false 刷新失败
+     * @param delay     延迟时间
+     */
+    public void refrushSuccess(final boolean isSuccess, long delay) {
+        Message obtain = Message.obtain();
+        obtain.what = REFRUSH;
+        obtain.obj = isSuccess;
+        if (handler.hasMessages(REFRUSH)) {
+            handler.removeMessages(REFRUSH);
+        }
+
+        handler.sendMessageDelayed(obtain, delay);
+    }
+
+    /**
+     * 是否加载更多成功
+     *
+     * @param isSuccess true 刷新成功 false 刷新失败
+     */
+    public void loadMore(boolean isSuccess) {
+        if (footView != null) {
+            if (isSuccess){
+                footView.refrushSuccess();
+            }else {
+                footView.refrushfail();
+            }
+        }
+    }
+
+    /**
+     * 是否加载更多完成
+     *
+     */
+    public void finishloadMore() {
+        footView.loadNoMore();
+    }
+
+
+    /**
+     * 是否加载更多
+     *
+     * @param isSuccess true 刷新成功 false 刷新失败
+     * @param delay     延迟时间
+     */
+    public void loadMore(final boolean isSuccess, long delay) {
+
+        Message obtain = Message.obtain();
+        obtain.what = LOADMORE;
+        obtain.obj = isSuccess;
+        if (handler.hasMessages(LOADMORE)) {
+            handler.removeMessages(LOADMORE);
+        }
+        handler.sendMessageDelayed(obtain, delay);
+    }
+
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (handler.hasMessages(REFRUSH)){
+            handler.removeMessages(REFRUSH);
+        }
+        if (handler.hasMessages(LOADMORE)){
+            handler.removeMessages(LOADMORE);
+        }
+
+    }
 }

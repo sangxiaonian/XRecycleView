@@ -32,10 +32,10 @@ public abstract class RefrushAdapter<T> extends BaseAdapter<T> {
         DefaultRefrushView refrushView = new DefaultRefrushView(context);
         ViewGroup.LayoutParams params = refrushView.getLayoutParams();
         if (params == null) {
-            params = new ViewGroup.LayoutParams(100, 100);
+            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100);
         } else {
             params.height = 100;
-            params.width = 100;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         }
 
         refrushView.setLayoutParams(params);
