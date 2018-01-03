@@ -55,12 +55,12 @@ public class BaseView extends View implements RefrushView {
         isVertical = true;
         sprinBack = new SpringScrollAnimation(isVertical).creatAnimotion(this);
         sprinBack.moveTo(0);
-        sprinBack.setMaxLength(standSize );
+        sprinBack.setMaxLength(Integer.MAX_VALUE);
         sprinBack.addEndListener(new DynamicAnimation.OnAnimationEndListener() {
             @Override
             public void onAnimationEnd(DynamicAnimation animation, boolean canceled, float value, float velocity) {
                 if (value == 0) {
-                    showDrag();
+                    changeStated(DRAGREFRUSH);
                 }
             }
         });

@@ -13,6 +13,9 @@ import android.util.AttributeSet;
 import android.view.animation.LinearInterpolator;
 
 import sang.com.freerecycleview.utils.DeviceUtils;
+import sang.com.freerecycleview.utils.FRLog;
+
+import static android.R.attr.bitmap;
 
 /**
  * 作者： ${PING} on 2017/12/27.
@@ -22,6 +25,9 @@ import sang.com.freerecycleview.utils.DeviceUtils;
 public class DefaultRefrushView extends BaseView {
 
 
+    private int mWidth;
+    private int mHeight;
+    private ShapFactory factory;
     private Paint mPaint;
     private Path mPath;
     private String dragText = "下拉刷新";
@@ -151,16 +157,14 @@ public class DefaultRefrushView extends BaseView {
 
     @Override
     public void onCancleDrag() {
-        if (state == UPREFRUSH) {//当前状态是松手刷新 则装更改为刷新
+        if (state==UPREFRUSH){
             changeStated(REFRUSH);
         }
         sprinBack.moveTo(getFinishValue());
     }
 
-
-
     /**
-     * 松手刷新
+     * 更改当前状态
      */
     public void showUPRefrush() {
         state = UPREFRUSH;
@@ -193,22 +197,5 @@ public class DefaultRefrushView extends BaseView {
         drawText = "";
     }
 
-    @Override
-    public void refrushSuccess() {
-        super.refrushSuccess();
-        drawText = "";
-    }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        cancle();
-        dragAnimation.cancel();
-    }
-
-    @Override
-    public void cancle() {
-        super.cancle();
-
-    }
 }
