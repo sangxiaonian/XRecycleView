@@ -19,18 +19,22 @@ import sang.com.freerecycleview.adapter.XAdapter;
 import sang.com.freerecycleview.holder.BaseHolder;
 import sang.com.freerecycleview.view.RefrushRecycleView;
 import sang.com.freerecycleview.view.SpringRecycleView;
+import sang.com.freerecycleview.view.refrush.RefrushControl;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     RefrushRecycleView recyclerView;
     Button btRefrush;
     Button btLoadMore;
+    List<String> list;
     private Context mContext;
+    private RefrushAdapter<String> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mContext=this;
+        mContext = this;
         initView();
 
 
@@ -38,46 +42,69 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         recyclerView = (RefrushRecycleView) findViewById(R.id.rv);
-        btLoadMore=findViewById(R.id.bt_load);
-        btRefrush=findViewById(R.id.bt_refrush);
+        btLoadMore = findViewById(R.id.bt_load);
+        btRefrush = findViewById(R.id.bt_refrush);
 
         btRefrush.setOnClickListener(this);
         btLoadMore.setOnClickListener(this);
 
-        LinearLayoutManager manager =new LinearLayoutManager(this);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
-        List<String> list =new ArrayList<>();
+        list = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
-            list.add(getString(R.string.app_name)+i);
+            list.add(getString(R.string.app_name) + i);
         }
 
-        recyclerView.setAdapter(new RefrushAdapter<String>(this,list) {
+        recyclerView.setListener(new RefrushControl.RefrushListener() {
+            @Override
+            public void onRefrush() {
+                int size = list.size() - 1;
+                list.clear();
+                for (int i = 0; i < size - 1; i++) {
+                    if (i == size - 1) {
+                        list.add("更新数据" + i);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+                recyclerView.refrushSuccess(true,200);
+            }
+
+            @Override
+            public void onLoadMore() {
+                list.add("新增数据了"+list.size());
+                adapter.notifyDataSetChanged();
+                recyclerView.loadMore(true,200);
+            }
+        });
+
+        adapter = new RefrushAdapter<String>(this, list) {
             @Override
             protected BaseHolder initHolder(ViewGroup parent, int viewType) {
-                return new BaseHolder<String>(parent,mContext,R.layout.item_textview){
+                return new BaseHolder<String>(parent, mContext, R.layout.item_textview) {
                     @Override
                     public void initView(View itemView, int position, String data) {
                         super.initView(itemView, position, data);
-                        TextView textView=itemView.findViewById(R.id.item_text);
+                        TextView textView = itemView.findViewById(R.id.item_text);
                         textView.setText(data);
-                        if (position%2==1) {
+                        if (position % 2 == 1) {
                             itemView.setBackgroundColor(Color.parseColor("#abcdef"));
-                        }else {
+                        } else {
                             itemView.setBackgroundColor(Color.parseColor("#fedcba"));
 
                         }
                     }
                 };
             }
-        });
+        };
+        recyclerView.setAdapter(adapter);
 
     }
 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.bt_load:
                 recyclerView.loadMore(true);
                 break;

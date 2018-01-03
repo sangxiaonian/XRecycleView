@@ -12,6 +12,7 @@ import sang.com.freerecycleview.adapter.RefrushAdapter;
 import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
 import sang.com.freerecycleview.view.refrush.BaseView;
+import sang.com.freerecycleview.view.refrush.RefrushControl;
 import sang.com.freerecycleview.view.refrush.RefrushView;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
@@ -28,6 +29,9 @@ public class RefrushRecycleView extends BaseRecycleView {
     private static final int LOADMORE = 2;
     private RefrushView topView;
     private RefrushView footView;
+   private RefrushControl.RefrushListener listener;
+
+
 
     private Handler handler = new Handler() {
         @Override
@@ -147,7 +151,9 @@ public class RefrushRecycleView extends BaseRecycleView {
         return candrag;
     }
 
-
+    public void setListener(RefrushControl.RefrushListener listener) {
+        this.listener = listener;
+    }
 
     @Override
     public void setAdapter(final Adapter adapter) {
@@ -155,9 +161,25 @@ public class RefrushRecycleView extends BaseRecycleView {
             TopRefrushHolder topRefrush = ((RefrushAdapter) adapter).getTopRefrush();
             final FootRefrushHolder footRefrush = ((RefrushAdapter) adapter).getFootRefrush();
             topView = (RefrushView) topRefrush.getItemView();
+            topView.setLoadListener(new RefrushControl.onLoadListener() {
+                @Override
+                public void onLoad() {
+                    if (listener!=null){
+                        listener.onRefrush();
+                    }
+                }
+            });
             footView = (RefrushView) footRefrush.getItemView();
             if (footView!=null){
                 footView.attachRecycleView(this);
+                footView.setLoadListener(new RefrushControl.onLoadListener() {
+                    @Override
+                    public void onLoad() {
+                        if (listener!=null){
+                            listener.onLoadMore();
+                        }
+                    }
+                });
             }
         }
         super.setAdapter(adapter);

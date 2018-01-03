@@ -31,7 +31,16 @@ public class BaseView extends View implements RefrushView {
     protected int standSize;//标准高度
     protected RecyclerView parentView;
     protected OverScrollAnimation fling;
+    protected RefrushControl.onLoadListener loadListener;
 
+    /**
+     * 设置加载监听
+     * @param loadListener
+     */
+    @Override
+    public void setLoadListener(RefrushControl.onLoadListener loadListener) {
+        this.loadListener = loadListener;
+    }
 
     public BaseView(Context context) {
         super(context);
@@ -328,6 +337,9 @@ public class BaseView extends View implements RefrushView {
      */
     public void startLoad() {
         state = REFRUSH;
+        if (loadListener!=null){
+            loadListener.onLoad();
+        }
     }
 
 }

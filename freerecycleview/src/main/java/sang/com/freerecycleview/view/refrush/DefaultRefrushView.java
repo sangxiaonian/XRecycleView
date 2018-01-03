@@ -113,7 +113,6 @@ public class DefaultRefrushView extends BaseView {
             width = widthSize;
         } else {
             width = widthSize;
-//            width = (getPaddingLeft() + DeviceUtils.dip2px(getContext(), 40) + getPaddingRight());
         }
         if (heightMode == MeasureSpec.EXACTLY) {
             heitht = heightSize;
@@ -167,7 +166,7 @@ public class DefaultRefrushView extends BaseView {
      * 更改当前状态
      */
     public void showUPRefrush() {
-        state = UPREFRUSH;
+        super.showUPRefrush();
         drawText = upText;
         dragAnimation.setIntValues(dragRoat,180);
         dragAnimation.start();
@@ -187,7 +186,7 @@ public class DefaultRefrushView extends BaseView {
      * 正在刷新
      */
     public void startLoad() {
-        state = REFRUSH;
+        super.startLoad();
         loadAnmition.start();
         drawText = "";
     }

@@ -54,5 +54,7 @@ public interface RefrushView {
 
     void attachRecycleView(RefrushRecycleView refrushRecycleView);
 
+    void setLoadListener(RefrushControl.onLoadListener loadListener);
+
     float getStandSize();
 }
