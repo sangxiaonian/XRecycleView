@@ -256,7 +256,7 @@ public class RefrushRecycleView extends BaseRecycleView {
      *
      */
     public void finishloadMore() {
-        footView.loadNoMore();
+        footView.finishLoadMore();
     }
 
 

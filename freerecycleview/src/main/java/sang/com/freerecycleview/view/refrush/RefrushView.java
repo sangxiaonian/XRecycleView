@@ -57,4 +57,6 @@ public interface RefrushView {
     void setLoadListener(RefrushControl.onLoadListener loadListener);
 
     float getStandSize();
+
+    void finishLoadMore();
 }

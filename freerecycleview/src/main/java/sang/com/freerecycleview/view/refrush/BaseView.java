@@ -35,6 +35,7 @@ public class BaseView extends View implements RefrushView {
 
     /**
      * 设置加载监听
+     *
      * @param loadListener
      */
     @Override
@@ -59,7 +60,7 @@ public class BaseView extends View implements RefrushView {
     }
 
     protected void initView(Context context, AttributeSet attrs) {
-        standSize= DeviceUtils.dip2px(context,50);
+        standSize = DeviceUtils.dip2px(context, 50);
 
         isVertical = true;
         sprinBack = new SpringScrollAnimation(isVertical).creatAnimotion(this);
@@ -76,7 +77,7 @@ public class BaseView extends View implements RefrushView {
         sprinBack.start();
         //惯性动画
         fling = new OverScrollAnimation(isVertical).creatAnimotion(this);
-        fling.setMaxLength(standSize*5);
+        fling.setMaxLength(standSize * 5);
         fling.addUpdateListener(new DynamicAnimation.OnAnimationUpdateListener() {
             @Override
             public void onAnimationUpdate(DynamicAnimation animation, float value, float velocity) {
@@ -97,11 +98,18 @@ public class BaseView extends View implements RefrushView {
 
     /**
      * 获取控件刷新高度
+     *
      * @return
      */
     @Override
     public float getStandSize() {
         return standSize;
+    }
+
+    @Override
+    public void finishLoadMore() {
+
+        changeStated(LOADNOMORE);
     }
 
     public void setStandSize(int standSize) {
@@ -188,13 +196,14 @@ public class BaseView extends View implements RefrushView {
         }
         setLayoutParams(params);
     }
+
     /**
      * 更改当前状态
      *
      * @param refrush
      */
     protected void changeStated(int refrush) {
-        if (refrush == state) {
+        if (refrush == state || state == LOADNOMORE) {
             return;
         }
         switch (refrush) {
@@ -213,9 +222,14 @@ public class BaseView extends View implements RefrushView {
             case FAIL:
                 refrushSuccess();
                 break;
-
+            case LOADNOMORE:
+                loadNoMore();
+                break;
         }
+        postInvalidate();
+
     }
+
     /**
      * 取消动画
      */
@@ -255,23 +269,24 @@ public class BaseView extends View implements RefrushView {
     public float getViewSize() {
         float translation = 0;
         if (isVertical) {//横向
-            translation =  getMeasuredHeight();
+            translation = getMeasuredHeight();
         } else {
-            translation =  getMeasuredWidth();
+            translation = getMeasuredWidth();
         }
         return translation;
     }
 
 
     public void attachRecycleView(RefrushRecycleView refrushRecycleView) {
-        parentView=refrushRecycleView;
+        parentView = refrushRecycleView;
     }
 
     public static final int DRAGREFRUSH = 0;//下拉刷新
-    public static final int UPREFRUSH    = 1;//松手刷新
-    public static final int REFRUSH     = 2;//正在刷新
-    public static final int SUCCESS     = 3;//加载成功
-    public static final int FAIL         = 4;//加载失败
+    public static final int UPREFRUSH = 1;//松手刷新
+    public static final int REFRUSH = 2;//正在刷新
+    public static final int SUCCESS = 3;//加载成功
+    public static final int FAIL = 4;//加载失败
+    public static final int LOADNOMORE = 5;//加载失败
     public int state;//当前加载状态
 
 
@@ -316,8 +331,10 @@ public class BaseView extends View implements RefrushView {
      */
     @Override
     public void loadNoMore() {
-
+        state = LOADNOMORE;
+        sprinBack.moveTo(getFinishValue());
     }
+
     /**
      * 松手刷新
      */
@@ -337,7 +354,7 @@ public class BaseView extends View implements RefrushView {
      */
     public void startLoad() {
         state = REFRUSH;
-        if (loadListener!=null){
+        if (loadListener != null) {
             loadListener.onLoad();
         }
     }

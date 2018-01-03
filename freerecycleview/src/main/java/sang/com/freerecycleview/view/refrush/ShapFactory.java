@@ -5,9 +5,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.text.TextUtils;
 
 import sang.com.freerecycleview.utils.DeviceUtils;
+
+import static android.R.attr.bitmap;
 
 /**
  * Description：
@@ -89,7 +93,7 @@ public class ShapFactory {
     }
 
     /**
-     * 绘制一个方块
+     * 绘制菊花加载
      *
      * @param mWidth    宽
      * @param mHeight   高
@@ -177,5 +181,26 @@ public class ShapFactory {
     }
 
 
+    public static Bitmap creatLoadNoMore(int measuredWidth, int size, Paint mPaint, String drawText) {
+        if (measuredWidth <= 0 || size <= 0|| TextUtils.isEmpty(drawText)) {
+            return null;
+        }
+        float strokeWidth = mPaint.getStrokeWidth();
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        Bitmap bitmap = Bitmap.createBitmap(measuredWidth, size, Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        Rect textRect=new Rect();
+        mPaint.getTextBounds(drawText, 0, drawText.length(), textRect);
+        int left = (measuredWidth  - textRect.width()) / 2;
+        int top = (size - bitmap.getHeight()) / 2;
+        canvas.drawBitmap(bitmap, left, top, mPaint);
+        Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
+        canvas.drawText(drawText, left , (size - (fontMetrics.top + fontMetrics.bottom)) / 2, mPaint);
+        canvas.drawLine(0,size/2,left-textRect.width()/drawText.length(),size/2,mPaint);
+        canvas.drawLine(left+textRect.width()/drawText.length()+textRect.width(),size/2,measuredWidth,size/2,mPaint);
+        mPaint.setStrokeWidth(strokeWidth);
+        mPaint.setAlpha(255);
 
+        return bitmap;
+    }
 }

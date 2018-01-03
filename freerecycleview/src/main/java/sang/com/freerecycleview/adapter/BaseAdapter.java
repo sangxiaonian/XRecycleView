@@ -11,6 +11,7 @@ import sang.com.freerecycleview.holder.BaseHolder;
 import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.PeakHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
+import sang.com.freerecycleview.utils.FRLog;
 
 
 /**
@@ -28,8 +29,8 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
     protected final int FOOTTYPE = 200000;
 
 
-    protected final int TOPREFRUSH = 200001;//顶部刷新
-    protected final int FOOTREFRUSH = 200002;//底部刷新
+    protected final int TOPREFRUSH = 300001;//顶部刷新
+    protected final int FOOTREFRUSH = 400002;//底部刷新
     protected int topRefrushPositin = -1;//头部刷新位置
     protected TopRefrushHolder topRefrush;//头部刷新
     protected FootRefrushHolder footRefrush;//底部刷新
@@ -43,7 +44,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
     }
 
     public int getTopRefrushPositin() {
-        return topRefrushPositin;
+        return topRefrushPositin>heads.size()+list.size()?heads.size()+list.size():topRefrushPositin;
     }
 
     public void setTopRefrushPositin(int topRefrushPositin) {
@@ -119,12 +120,12 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
 
-        if (hasTopRefrush() && topRefrushPositin == position) {//顶部刷新
+        if (hasTopRefrush() && getTopRefrushPositin() == position) {//顶部刷新
             return TOPREFRUSH;
         } else if (hasFootRefrush() && position == getItemCount() - 1) {//底部刷新
             return FOOTREFRUSH;
         } else {
-            if (hasTopRefrush() && position > topRefrushPositin) {//有顶部刷新,则在刷新位置之后,在原有基础上,position减去顶部刷新带来的影响
+            if (hasTopRefrush() && position > getTopRefrushPositin()) {//有顶部刷新,则在刷新位置之后,在原有基础上,position减去顶部刷新带来的影响
                 position -= 1;
             }
             if (position < heads.size()) {
@@ -135,8 +136,6 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
                 position -= heads.size();
             }
         }
-
-
         return getViewType(position);
     }
 
@@ -145,12 +144,11 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
     }
 
     protected boolean hasTopRefrush() {
-        return topRefrush != null && topRefrushPositin >= 0;
+        return topRefrush != null &&  getTopRefrushPositin() >= 0;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
-
         if (viewType == TOPREFRUSH) {
             return topRefrush;
         } else if (viewType == FOOTREFRUSH) {
@@ -160,6 +158,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
         } else if (viewType >= FOOTTYPE) {
             return foots.get(viewType - FOOTTYPE);
         } else {
+
             return initHolder(parent, viewType);
         }
     }
@@ -174,7 +173,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
         } else if (viewType == FOOTREFRUSH) {
             footRefrush.initView(position);
         } else {
-            if (hasTopRefrush() && position > topRefrushPositin) {
+            if (hasTopRefrush() && position > getTopRefrushPositin()) {
                 position--;
             }
             if (viewType >= HEADTYPE) {//脚布局

@@ -14,12 +14,14 @@ import android.view.animation.LinearInterpolator;
 
 import sang.com.freerecycleview.utils.DeviceUtils;
 
+import static android.R.attr.bitmap;
+
 /**
  * 作者： ${PING} on 2017/12/27.
  * 默认情况下的刷新控件
  */
 
-public class DefaultRefrushView extends BaseView {
+public class DefaultLoadMoreView extends BaseView {
 
 
 
@@ -34,18 +36,18 @@ public class DefaultRefrushView extends BaseView {
     private String drawText = "";
 
 
-    public DefaultRefrushView(Context context) {
+    public DefaultLoadMoreView(Context context) {
         super(context);
         initView(context, null);
     }
 
-    public DefaultRefrushView(Context context, @Nullable AttributeSet attrs) {
+    public DefaultLoadMoreView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initView(context, attrs);
 
     }
 
-    public DefaultRefrushView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public DefaultLoadMoreView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context, attrs);
     }
@@ -129,15 +131,17 @@ public class DefaultRefrushView extends BaseView {
             bitmap = ShapFactory.creatArrows(size, size, 12, dragRoat, mPath, mPaint);
         } else if (state == UPREFRUSH) {
             bitmap = ShapFactory.creatArrows(size, size, 12, dragRoat, mPath, mPaint);
+        } else if (state == LOADNOMORE){
+            bitmap = ShapFactory.creatLoadNoMore(getMeasuredWidth(), size, mPaint, "没有更多数据了");
         } else {
             bitmap = ShapFactory.creatLoad(size, size, mPaint, -startRoat);
         }
         if (bitmap != null) {
+            mPaint.getTextBounds(drawText, 0, drawText.length(), textRect);
             int left = (getMeasuredWidth() - bitmap.getWidth() - textRect.width()) / 2;
             int top = (getMeasuredHeight() - bitmap.getHeight()) / 2;
             canvas.drawBitmap(bitmap, left, top, mPaint);
             bitmap.recycle();
-            mPaint.getTextBounds(drawText, 0, drawText.length(), textRect);
             Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
             canvas.drawText(drawText, left + bitmap.getWidth() + gap, (getMeasuredHeight() - (fontMetrics.top + fontMetrics.bottom)) / 2, mPaint);
         }
@@ -162,6 +166,12 @@ public class DefaultRefrushView extends BaseView {
         drawText = upText;
         dragAnimation.setIntValues(dragRoat, 180);
         dragAnimation.start();
+    }
+
+    @Override
+    public void loadNoMore() {
+        super.loadNoMore();
+        drawText="";
     }
 
     /**

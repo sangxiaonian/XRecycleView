@@ -61,22 +61,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onRefrush() {
                 int size = list.size() - 1;
                 list.clear();
-                for (int i = 0; i < size - 1; i++) {
-                    if (i == size - 1) {
-                        list.add("更新数据" + i);
+                for (int i = 0; i < size ; i++) {
+                    if (i == 0) {
+                        list.add("更新数据" + size);
+                    }else {
+                        list.add(getString(R.string.app_name) + i);
                     }
                 }
                 adapter.notifyDataSetChanged();
-                recyclerView.refrushSuccess(true,200);
+                recyclerView.refrushSuccess(true,500);
             }
 
             @Override
             public void onLoadMore() {
                 list.add("新增数据了"+list.size());
                 adapter.notifyDataSetChanged();
-                recyclerView.loadMore(true,200);
+                recyclerView.loadMore(true,500);
             }
         });
+
+
 
         adapter = new RefrushAdapter<String>(this, list) {
             @Override
@@ -106,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_load:
-                recyclerView.loadMore(true);
+//                recyclerView.loadMore(true);
+                recyclerView.finishloadMore();
                 break;
             case R.id.bt_refrush:
                 recyclerView.refrushSuccess(true);
