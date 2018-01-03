@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import sang.com.freerecycleview.utils.DeviceUtils;
 import sang.com.freerecycleview.utils.animation.SpringScrollAnimation;
 import sang.com.freerecycleview.utils.animation.OverScrollAnimation;
 import sang.com.freerecycleview.view.RefrushRecycleView;
@@ -24,7 +25,6 @@ public class BaseView extends View implements RefrushView {
 
 
     protected boolean isTop = true;
-    protected PointF standPoint;
     protected boolean isVertical;
     protected SpringScrollAnimation sprinBack;//回弹动画
     protected boolean flingActivate;//惯性滑动是否激活刷新功能
@@ -50,21 +50,24 @@ public class BaseView extends View implements RefrushView {
     }
 
     protected void initView(Context context, AttributeSet attrs) {
-        standPoint = new PointF();
+        standSize= DeviceUtils.dip2px(context,50);
+
         isVertical = true;
         sprinBack = new SpringScrollAnimation(isVertical).creatAnimotion(this);
         sprinBack.moveTo(0);
+        sprinBack.setMaxLength(standSize );
         sprinBack.addEndListener(new DynamicAnimation.OnAnimationEndListener() {
             @Override
             public void onAnimationEnd(DynamicAnimation animation, boolean canceled, float value, float velocity) {
                 if (value == 0) {
-                    state = DRAGREFRUSH;
+                    showDrag();
                 }
             }
         });
         sprinBack.start();
         //惯性动画
         fling = new OverScrollAnimation(isVertical).creatAnimotion(this);
+        fling.setMaxLength(standSize*5);
         fling.addUpdateListener(new DynamicAnimation.OnAnimationUpdateListener() {
             @Override
             public void onAnimationUpdate(DynamicAnimation animation, float value, float velocity) {
@@ -100,25 +103,6 @@ public class BaseView extends View implements RefrushView {
         this.isTop = isTop;
     }
 
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if (standPoint.x == 0 && standPoint.y == 0) {
-            standPoint.x = w;
-            if (h == 0) {
-                h = 100;
-            }
-            standPoint.y = h;
-            if (isVertical) {
-                standSize = h;
-            } else {
-                standSize = w;
-            }
-            fling.setMaxLength(standSize * 5);
-            sprinBack.setMaxLength(standSize * 5);
-        }
-    }
-
     /**
      * 拖拽监听
      *
@@ -133,29 +117,45 @@ public class BaseView extends View implements RefrushView {
             if (isVertical) {
                 current = getMeasuredHeight();
                 drag = dragY;
-                v = Math.abs(current / standSize);
             } else {
                 current = getMeasuredWidth();
                 drag = dragX;
-                v = Math.abs(current / standSize);
             }
         } else {
             if (isVertical) {
                 current = getMeasuredHeight();
                 drag = -dragY;
-                v = Math.abs(current / standSize);
             } else {
                 current = getMeasuredWidth();
                 drag = -dragX;
-                v = Math.abs(current / standSize);
             }
         }
+        v = Math.abs(current / standSize);
+
         v = v < 1 ? 1 : v;
         if (Math.abs(current) > Math.abs(current + drag)) {
             v = 1;
         }
 
         changeHeight(isVertical, (int) (current + drag / v));
+
+
+        v = v < 1 ? 1 : v;
+        if (Math.abs(current) > Math.abs(current + drag)) {
+            v = 1;
+        }
+        float value = current + drag / v;
+        if (!canChangeStated()) {
+            value = value < standSize ? standSize : value;
+        }
+        changeHeight(isVertical, (int) (value));
+        if (canChangeStated()) {
+            if (getMeasuredHeight() < standSize && state != DRAGREFRUSH) {
+                changeStated(DRAGREFRUSH);
+            } else if (getMeasuredHeight() > standSize && state != UPREFRUSH) {
+                changeStated(UPREFRUSH);
+            }
+        }
 
     }
 
@@ -179,7 +179,34 @@ public class BaseView extends View implements RefrushView {
         }
         setLayoutParams(params);
     }
+    /**
+     * 更改当前状态
+     *
+     * @param refrush
+     */
+    protected void changeStated(int refrush) {
+        if (refrush == state) {
+            return;
+        }
+        switch (refrush) {
+            case DRAGREFRUSH:
+                showDrag();
+                break;
+            case UPREFRUSH:
+                showUPRefrush();
+                break;
+            case REFRUSH:
+                startLoad();
+                break;
+            case SUCCESS:
+                refrushSuccess();
+                break;
+            case FAIL:
+                refrushSuccess();
+                break;
 
+        }
+    }
     /**
      * 取消动画
      */
@@ -232,10 +259,10 @@ public class BaseView extends View implements RefrushView {
     }
 
     public static final int DRAGREFRUSH = 0;//下拉刷新
-    public static final int UPREFRUSH = 1;//松手刷新
-    public static final int REFRUSH = 2;//正在刷新
-    public static final int SUCCESS = 3;//加载成功
-    public static final int FAIL = 4;//加载失败
+    public static final int UPREFRUSH    = 1;//松手刷新
+    public static final int REFRUSH     = 2;//正在刷新
+    public static final int SUCCESS     = 3;//加载成功
+    public static final int FAIL         = 4;//加载失败
     public int state;//当前加载状态
 
 
@@ -254,7 +281,6 @@ public class BaseView extends View implements RefrushView {
      */
     public int getFinishValue() {
         if (state == DRAGREFRUSH || state == SUCCESS || state == FAIL) {
-            sprinBack.moveTo(0);
             return 0;
         } else {
             return standSize;
@@ -282,6 +308,26 @@ public class BaseView extends View implements RefrushView {
     @Override
     public void loadNoMore() {
 
+    }
+    /**
+     * 松手刷新
+     */
+    public void showUPRefrush() {
+        state = UPREFRUSH;
+    }
+
+    /**
+     * 下拉刷新
+     */
+    public void showDrag() {
+        state = DRAGREFRUSH;
+    }
+
+    /**
+     * 正在刷新
+     */
+    public void startLoad() {
+        state = REFRUSH;
     }
 
 }

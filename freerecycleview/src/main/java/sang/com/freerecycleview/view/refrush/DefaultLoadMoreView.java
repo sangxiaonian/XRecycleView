@@ -19,7 +19,7 @@ import sang.com.freerecycleview.utils.DeviceUtils;
  * 默认情况下的刷新控件
  */
 
-public class DefaultRefrushView extends BaseView {
+public class DefaultLoadMoreView extends BaseView {
 
 
     private Paint mPaint;
@@ -33,18 +33,18 @@ public class DefaultRefrushView extends BaseView {
     private String drawText="";
 
 
-    public DefaultRefrushView(Context context) {
+    public DefaultLoadMoreView(Context context) {
         super(context);
         initView(context, null);
     }
 
-    public DefaultRefrushView(Context context, @Nullable AttributeSet attrs) {
+    public DefaultLoadMoreView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initView(context, attrs);
 
     }
 
-    public DefaultRefrushView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public DefaultLoadMoreView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context, attrs);
     }
@@ -53,7 +53,7 @@ public class DefaultRefrushView extends BaseView {
     @Override
     protected void initView(Context context, AttributeSet attrs) {
         super.initView(context, attrs);
-
+        dragRoat=180;
         drawText=dragText;
         textRect = new Rect();
         gap = DeviceUtils.dip2px(context, 5);
@@ -165,7 +165,7 @@ public class DefaultRefrushView extends BaseView {
     public void showUPRefrush() {
         state = UPREFRUSH;
         drawText = upText;
-        dragAnimation.setIntValues(dragRoat,180);
+        dragAnimation.setIntValues(dragRoat,0);
         dragAnimation.start();
     }
 
@@ -175,7 +175,7 @@ public class DefaultRefrushView extends BaseView {
     public void showDrag() {
         state = DRAGREFRUSH;
         drawText = dragText;
-        dragAnimation.setIntValues(dragRoat,0);
+        dragAnimation.setIntValues(dragRoat,180);
         dragAnimation.start();
     }
 
@@ -203,12 +203,12 @@ public class DefaultRefrushView extends BaseView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         cancle();
-        dragAnimation.cancel();
     }
 
     @Override
     public void cancle() {
         super.cancle();
-
+        loadAnmition.cancel();
+        dragAnimation.cancel();
     }
 }

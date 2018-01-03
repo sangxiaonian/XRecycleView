@@ -1,6 +1,5 @@
 package sang.com.freerecycleview.view.refrush;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,32 +17,6 @@ import sang.com.freerecycleview.utils.DeviceUtils;
  */
 public class ShapFactory {
 
-    private Path mPath;
-    private Paint mPaint;
-    private static ShapFactory factory;
-    private Context context;
-
-    public static ShapFactory getInstance(Path mPath, Paint mPaint) {
-        factory = new ShapFactory(mPath, mPaint);
-        return factory;
-    }
-
-    public static ShapFactory getInstance(Path mPath, Paint mPaint, Context context) {
-        factory = new ShapFactory(mPath, mPaint, context);
-        return factory;
-    }
-
-    private ShapFactory(Path mPath, Paint mPaint) {
-        this.mPaint = mPaint;
-        this.mPath = mPath;
-    }
-
-    private ShapFactory(Path mPath, Paint mPaint, Context context) {
-        this.mPaint = mPaint;
-        this.mPath = mPath;
-        this.context = context;
-
-    }
 
     /**
      * 绘制一个箭头
@@ -51,16 +24,18 @@ public class ShapFactory {
      * @param mWidth  控件高度
      * @param mHeight 控件宽
      * @param den     箭头杆空格数量
-     * @return 一个向下的箭头
+     * @param dragRoat
+     *@param mPath
+     * @param mPaint   @return 一个向下的箭头
      */
-    public Bitmap creatArrows(int mWidth, int mHeight, int den) {
-
-        if (mWidth<=0||mHeight<=0){
+    public static Bitmap creatArrows(int mWidth, int mHeight, int den, int dragRoat, Path mPath, Paint mPaint) {
+        if (mWidth <= 0 || mHeight <= 0) {
             return null;
         }
-
         Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
+        canvas.save();
+        canvas.rotate(dragRoat,mWidth/2,mHeight/2);
         mPath.reset();
         mPaint.setStyle(Paint.Style.FILL);
         int amount = 0;
@@ -87,6 +62,7 @@ public class ShapFactory {
             }
         }
         canvas.drawPath(mPath, mPaint);
+        canvas.restore();
         return bitmap;
     }
 
@@ -95,19 +71,53 @@ public class ShapFactory {
      *
      * @param mWidth  宽
      * @param mHeight 高
+     * @param mPath
+     * @param mPaint
      * @return 一个四方形的Bitmap
      */
-    public Bitmap creatShap(int mWidth, int mHeight) {
-        if (mWidth<=0||mHeight<=0){
+    public static Bitmap creatShap(int mWidth, int mHeight, Path mPath, Paint mPaint) {
+        if (mWidth <= 0 || mHeight <= 0) {
             return null;
         }
-
         Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
         mPath.reset();
         mPaint.setStyle(Paint.Style.FILL);
-        mPath.addRect(0, 0, mWidth, mHeight, Path.Direction.CCW);
+        mPath.addRect(0, 0, mWidth, mHeight, Path.Direction.CW);
         canvas.drawPath(mPath, mPaint);
+        return bitmap;
+    }
+
+    /**
+     * 绘制一个方块
+     *
+     * @param mWidth    宽
+     * @param mHeight   高
+     * @param startRoat
+     * @return 一个四方形的Bitmap
+     */
+    public static Bitmap creatLoad(int mWidth, int mHeight, Paint mPaint, int startRoat) {
+        if (mWidth <= 0 || mHeight <= 0) {
+            return null;
+        }
+        float strokeWidth = mPaint.getStrokeWidth();
+        int gap = mWidth/13;
+
+        mPaint.setStrokeWidth(gap);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        for (int i = 0; i < 12; i++) {
+            canvas.save();
+            canvas.rotate(30 * i + startRoat, mWidth / 2, mHeight / 2);
+            mPaint.setAlpha(255 * (12 - i) / 12);
+            canvas.drawLine(mWidth / 2, gap, mWidth / 2, 4*gap, mPaint);
+
+            canvas.restore();
+        }
+
+        mPaint.setStrokeWidth(strokeWidth);
+        mPaint.setAlpha(255);
         return bitmap;
     }
 
@@ -116,9 +126,11 @@ public class ShapFactory {
      *
      * @param mWidth
      * @param mHeight
+     * @param mPaint
+     * @param mPath
      * @return
      */
-    public Bitmap creatCorrect(int mWidth, int mHeight) {
+    public static Bitmap creatCorrect(int mWidth, int mHeight, Paint mPaint, Path mPath) {
         Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
         mPath.reset();
@@ -146,9 +158,11 @@ public class ShapFactory {
      *
      * @param mWidth
      * @param mHeight
+     * @param mPaint
+     * @param mPath
      * @return
      */
-    public Bitmap creatError(int mWidth, int mHeight) {
+    public static Bitmap creatError(int mWidth, int mHeight, Paint mPaint, Path mPath) {
         Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
         mPath.reset();
@@ -162,35 +176,6 @@ public class ShapFactory {
         return bitmap;
     }
 
-    /**
-     * 绘制加载
-     *
-     * @param mWidth
-     * @param mHeight
-     * @return
-     */
-    public Bitmap creatLoading(int mWidth, int mHeight) {
-        Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
-        Canvas canvas = new Canvas(bitmap);
-
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setColor(Color.GRAY);
-        mPaint.setStrokeWidth(DeviceUtils.dip2px(context, 4));
-        int radius = mWidth / 4;
-        int centerX = mWidth / 2;
-        int centerY = mHeight / 2;
-        RectF rectF = new RectF();
-        rectF.left = centerX - radius;
-        rectF.top = centerY - radius;
-        rectF.right = centerX + radius;
-        rectF.bottom = centerY + radius;
-        for (int i = 0; i < 120; i++) {
-            if (i % 10 == 0) {
-                canvas.drawArc(rectF, 3 * i, 3, false, mPaint);
-            }
-        }
-        return bitmap;
-    }
 
 
 }

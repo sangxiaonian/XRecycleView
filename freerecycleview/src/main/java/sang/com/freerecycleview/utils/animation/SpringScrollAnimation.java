@@ -12,7 +12,7 @@ import android.view.View;
 public class SpringScrollAnimation extends BaseAnimation {
 
 
-    private SpringAnimation fling;
+    private SpringAnimation spring;
 
     public SpringScrollAnimation(String name) {
         super(name);
@@ -27,24 +27,24 @@ public class SpringScrollAnimation extends BaseAnimation {
 
     public SpringScrollAnimation creatAnimotion(View view) {
         animation = new SpringAnimation(view, this);
-        fling= (SpringAnimation) animation;
+        spring = (SpringAnimation) animation;
         return this;
     }
 
 
     public SpringScrollAnimation addEndListener(DynamicAnimation.OnAnimationEndListener listener) {
-        fling.addEndListener(listener);
+        spring.addEndListener(listener);
         return this;
     }
 
 
     public void start() {
-        fling. getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
-        fling.start();
+        spring. getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
+        spring.start();
     }
 
     public SpringScrollAnimation addUpdateListener(DynamicAnimation.OnAnimationUpdateListener onAnimationUpdateListener) {
-        fling.addUpdateListener(onAnimationUpdateListener);
+        spring.addUpdateListener(onAnimationUpdateListener);
         return this;
     }
 
@@ -54,11 +54,11 @@ public class SpringScrollAnimation extends BaseAnimation {
 
 
     public SpringForce setDampingRatio(float dampingRatioNoBouncy) {
-        return fling.getSpring().setDampingRatio(dampingRatioNoBouncy);
+        return spring.getSpring().setDampingRatio(dampingRatioNoBouncy);
     }
 
     public void cancel() {
-        fling.cancel();
+        spring.cancel();
     }
 
     /**
@@ -68,9 +68,7 @@ public class SpringScrollAnimation extends BaseAnimation {
      */
     @Override
     public void moveTo(float value) {
-
-        fling.animateToFinalPosition(value);
-
+        spring.animateToFinalPosition(value);
     }
 
 

@@ -7,6 +7,8 @@ import android.support.animation.FloatPropertyCompat;
 import android.view.View;
 import android.view.ViewGroup;
 
+import sang.com.freerecycleview.utils.FRLog;
+
 /**
  * 作者： ${PING} on 2017/12/28.
  */
@@ -66,11 +68,17 @@ public abstract class BaseAnimation extends FloatPropertyCompat<View> implements
     @Override
     public void setValue(View view, float value) {
         //更新要修改的动画属性
+
+        FRLog.i(value+">>>"+maxLength);
+
         int currentHeight = (int) value;
         if (currentHeight > maxLength) {
             currentHeight = maxLength;
             cancel();
         }
+
+
+
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (params == null) {
             if (isVertical) {
@@ -88,25 +96,6 @@ public abstract class BaseAnimation extends FloatPropertyCompat<View> implements
         view.setLayoutParams(params);
     }
 
-    private int getCurrentHeight(View view) {
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        int current = 0;
-        if (params == null) {
-            if (isVertical) {
-                current = view.getMeasuredHeight();
-            } else {
-                current = view.getMeasuredWidth();
-            }
-        } else {
-            if (isVertical) {
-                current = params.height;
-            } else {
-                current = params.width;
-            }
-        }
-
-        return current;
-    }
 
 
     /**
