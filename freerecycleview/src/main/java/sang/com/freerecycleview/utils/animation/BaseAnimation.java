@@ -68,9 +68,6 @@ public abstract class BaseAnimation extends FloatPropertyCompat<View> implements
     @Override
     public void setValue(View view, float value) {
         //更新要修改的动画属性
-
-        FRLog.i(value+">>>"+maxLength);
-
         int currentHeight = (int) value;
         if (currentHeight > maxLength) {
             currentHeight = maxLength;

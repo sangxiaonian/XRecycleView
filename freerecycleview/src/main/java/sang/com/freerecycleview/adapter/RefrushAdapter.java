@@ -23,36 +23,8 @@ public abstract class RefrushAdapter<T> extends BaseAdapter<T> {
 
     public RefrushAdapter(Context context, List<T> list) {
         super(context, list);
-        topRefrush = new TopRefrushHolder(getDefaultRefrushView(context));
-        footRefrush = new FootRefrushHolder(getDefaultRefrushView1(context));
-        setTopRefrushPositin(2);
     }
 
 
-    private DefaultRefrushView getDefaultRefrushView(Context context) {
-        DefaultRefrushView refrushView = new DefaultRefrushView(context);
-        ViewGroup.LayoutParams params = refrushView.getLayoutParams();
-        if (params == null) {
-            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100);
-        } else {
-            params.height = 100;
-            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        }
 
-        refrushView.setLayoutParams(params);
-        return refrushView;
-    }
-    private DefaultLoadMoreView getDefaultRefrushView1(Context context) {
-        DefaultLoadMoreView refrushView = new DefaultLoadMoreView(context);
-        ViewGroup.LayoutParams params = refrushView.getLayoutParams();
-        if (params == null) {
-            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100);
-        } else {
-            params.height = 100;
-            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        }
-
-        refrushView.setLayoutParams(params);
-        return refrushView;
-    }
 }

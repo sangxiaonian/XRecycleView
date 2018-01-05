@@ -12,6 +12,7 @@ import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.PeakHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
 import sang.com.freerecycleview.utils.FRLog;
+import sang.com.freerecycleview.view.refrush.BaseView;
 
 
 /**
@@ -55,16 +56,16 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter {
         return topRefrush;
     }
 
-    public void setTopRefrush(TopRefrushHolder topRefrush) {
-        this.topRefrush = topRefrush;
+    public void setTopRefrush(BaseView topRefrush) {
+        this.topRefrush = new TopRefrushHolder(topRefrush);
     }
 
     public FootRefrushHolder getFootRefrush() {
         return footRefrush;
     }
 
-    public void setFootRefrush(FootRefrushHolder footRefrush) {
-        this.footRefrush = footRefrush;
+    public void setFootRefrush(BaseView footRefrush) {
+        this.footRefrush = new FootRefrushHolder(footRefrush);
     }
 
     public void addHeard(PeakHolder heardHolder) {

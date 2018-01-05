@@ -34,9 +34,7 @@ public interface RefrushView {
      */
     void refrushfail();
 
-    /**
-     * 没有更多数据
-     */
+
     void loadNoMore();
 
     /**
@@ -52,11 +50,21 @@ public interface RefrushView {
      */
     float getViewSize();
 
+    /**
+     *  将RecycleView 和 刷新控件结合起来
+     * @param refrushRecycleView
+     */
     void attachRecycleView(RefrushRecycleView refrushRecycleView);
 
     void setLoadListener(RefrushControl.onLoadListener loadListener);
 
+    /**
+     * 获取刷新时候控件高度
+     * @return
+     */
     float getStandSize();
-
+    /**
+     *  没有更多数据时候调用
+     */
     void finishLoadMore();
 }

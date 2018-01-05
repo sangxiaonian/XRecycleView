@@ -67,13 +67,13 @@ public class DefaultRefrushView extends BaseView {
 
         mPath = new Path();
 
-        loadAnmition = ValueAnimator.ofInt(0, 12);
+        loadAnmition = ValueAnimator.ofInt(0, 9);
         loadAnmition.setDuration(1000);
         loadAnmition.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int value = (int) animation.getAnimatedValue();
-                startRoat = value * 30;
+                startRoat = value ;
                 postInvalidate();
             }
         });
@@ -144,6 +144,8 @@ public class DefaultRefrushView extends BaseView {
 
         canvas.restore();
     }
+
+
 
 
     @Override

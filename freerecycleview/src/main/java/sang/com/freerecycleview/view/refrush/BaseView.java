@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import sang.com.freerecycleview.utils.DeviceUtils;
+import sang.com.freerecycleview.utils.FRLog;
 import sang.com.freerecycleview.utils.animation.SpringScrollAnimation;
 import sang.com.freerecycleview.utils.animation.OverScrollAnimation;
 import sang.com.freerecycleview.view.RefrushRecycleView;
@@ -153,23 +154,17 @@ public class BaseView extends View implements RefrushView {
         if (Math.abs(current) > Math.abs(current + drag)) {
             v = 1;
         }
-
-        changeHeight(isVertical, (int) (current + drag / v));
-
-
-        v = v < 1 ? 1 : v;
-        if (Math.abs(current) > Math.abs(current + drag)) {
-            v = 1;
-        }
         float value = current + drag / v;
         if (!canChangeStated()) {
             value = value < standSize ? standSize : value;
         }
+
+
         changeHeight(isVertical, (int) (value));
         if (canChangeStated()) {
-            if (getMeasuredHeight() < standSize && state != DRAGREFRUSH) {
+            if (getMeasuredHeight() <= standSize && state != DRAGREFRUSH) {
                 changeStated(DRAGREFRUSH);
-            } else if (getMeasuredHeight() > standSize && state != UPREFRUSH) {
+            } else if (getMeasuredHeight() >standSize && state != UPREFRUSH) {
                 changeStated(UPREFRUSH);
             }
         }

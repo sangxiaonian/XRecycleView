@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import sang.com.freerecycleview.adapter.RefrushAdapter;
 import sang.com.freerecycleview.holder.FootRefrushHolder;
 import sang.com.freerecycleview.holder.TopRefrushHolder;
+import sang.com.freerecycleview.utils.FRLog;
 import sang.com.freerecycleview.view.refrush.BaseView;
+import sang.com.freerecycleview.view.refrush.LoadViewFactory;
 import sang.com.freerecycleview.view.refrush.RefrushControl;
 import sang.com.freerecycleview.view.refrush.RefrushView;
 
@@ -27,10 +29,9 @@ public class RefrushRecycleView extends BaseRecycleView {
 
     private static final int REFRUSH = 1;
     private static final int LOADMORE = 2;
-    private RefrushView topView;
-    private RefrushView footView;
-   private RefrushControl.RefrushListener listener;
-
+    private BaseView topView;
+    private BaseView footView;
+    private RefrushControl.RefrushListener listener;
 
 
     private Handler handler = new Handler() {
@@ -63,6 +64,8 @@ public class RefrushRecycleView extends BaseRecycleView {
     @Override
     protected void initView(Context context) {
         super.initView(context);
+        topView = LoadViewFactory.getDefaultRefrushView(context);
+        footView = LoadViewFactory.getDefaultLoadMore(context);
     }
 
     /**
@@ -115,7 +118,6 @@ public class RefrushRecycleView extends BaseRecycleView {
      */
     @Override
     protected void onStarteDrag() {
-
         topView.startDrag();
         footView.startDrag();
     }
@@ -155,27 +157,59 @@ public class RefrushRecycleView extends BaseRecycleView {
         this.listener = listener;
     }
 
-    @Override
-    public void setAdapter(final Adapter adapter) {
-        if (adapter instanceof RefrushAdapter) {
-            TopRefrushHolder topRefrush = ((RefrushAdapter) adapter).getTopRefrush();
-            final FootRefrushHolder footRefrush = ((RefrushAdapter) adapter).getFootRefrush();
-            topView = (RefrushView) topRefrush.getItemView();
+
+    public void setTopView(BaseView topView) {
+        this.topView = topView;
+        if (getAdapter()!=null&&getAdapter() instanceof RefrushAdapter) {
+            ((RefrushAdapter) getAdapter()).setTopRefrush(topView);
             topView.setLoadListener(new RefrushControl.onLoadListener() {
                 @Override
                 public void onLoad() {
-                    if (listener!=null){
+                    if (listener != null) {
                         listener.onRefrush();
                     }
                 }
             });
-            footView = (RefrushView) footRefrush.getItemView();
-            if (footView!=null){
+
+        }
+    }
+
+    public void setFootView(BaseView footView) {
+        this.footView = footView;
+        if (getAdapter()!=null&&getAdapter() instanceof RefrushAdapter) {
+            ((RefrushAdapter) getAdapter()).setTopRefrush(footView);
+            footView.setLoadListener(new RefrushControl.onLoadListener() {
+                @Override
+                public void onLoad() {
+                    if (listener != null) {
+                        listener.onLoadMore();
+                    }
+                }
+            });
+
+        }
+    }
+
+    @Override
+    public void setAdapter(final Adapter adapter) {
+        if (adapter instanceof RefrushAdapter) {
+            ((RefrushAdapter) adapter).setTopRefrushPositin(1);
+            ((RefrushAdapter) adapter).setTopRefrush(topView);
+            ((RefrushAdapter) adapter).setFootRefrush(footView);
+            topView.setLoadListener(new RefrushControl.onLoadListener() {
+                @Override
+                public void onLoad() {
+                    if (listener != null) {
+                        listener.onRefrush();
+                    }
+                }
+            });
+            if (footView != null) {
                 footView.attachRecycleView(this);
                 footView.setLoadListener(new RefrushControl.onLoadListener() {
                     @Override
                     public void onLoad() {
-                        if (listener!=null){
+                        if (listener != null) {
                             listener.onLoadMore();
                         }
                     }
@@ -188,6 +222,7 @@ public class RefrushRecycleView extends BaseRecycleView {
 
     /**
      * 是否可以滑动
+     *
      * @param direction
      * @return
      */
@@ -210,9 +245,9 @@ public class RefrushRecycleView extends BaseRecycleView {
      */
     public void refrushSuccess(boolean isSuccess) {
         if (topView != null) {
-            if (isSuccess){
+            if (isSuccess) {
                 topView.refrushSuccess();
-            }else {
+            } else {
                 topView.refrushfail();
             }
         }
@@ -243,9 +278,9 @@ public class RefrushRecycleView extends BaseRecycleView {
      */
     public void loadMore(boolean isSuccess) {
         if (footView != null) {
-            if (isSuccess){
+            if (isSuccess) {
                 footView.refrushSuccess();
-            }else {
+            } else {
                 footView.refrushfail();
             }
         }
@@ -253,7 +288,6 @@ public class RefrushRecycleView extends BaseRecycleView {
 
     /**
      * 是否加载更多完成
-     *
      */
     public void finishloadMore() {
         footView.finishLoadMore();
@@ -281,10 +315,10 @@ public class RefrushRecycleView extends BaseRecycleView {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (handler.hasMessages(REFRUSH)){
+        if (handler.hasMessages(REFRUSH)) {
             handler.removeMessages(REFRUSH);
         }
-        if (handler.hasMessages(LOADMORE)){
+        if (handler.hasMessages(LOADMORE)) {
             handler.removeMessages(LOADMORE);
         }
 

@@ -27,7 +27,7 @@ public class DefaultLoadMoreView extends BaseView {
 
     private Paint mPaint;
     private Path mPath;
-    private String dragText = "下拉刷新";
+    private String dragText = "上拉刷新";
     private String upText = "松手刷新";
     private Rect textRect;
     private float gap;
@@ -56,7 +56,7 @@ public class DefaultLoadMoreView extends BaseView {
     @Override
     protected void initView(Context context, AttributeSet attrs) {
         super.initView(context, attrs);
-
+        dragRoat=180;
         drawText = dragText;
         textRect = new Rect();
         gap = DeviceUtils.dip2px(context, 5);
@@ -69,13 +69,13 @@ public class DefaultLoadMoreView extends BaseView {
 
         mPath = new Path();
 
-        loadAnmition = ValueAnimator.ofInt(0, 12);
+        loadAnmition = ValueAnimator.ofInt(0, Integer.MAX_VALUE);
         loadAnmition.setDuration(1000);
         loadAnmition.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int value = (int) animation.getAnimatedValue();
-                startRoat = value * 30;
+                startRoat = value ;
                 postInvalidate();
             }
         });
@@ -164,7 +164,7 @@ public class DefaultLoadMoreView extends BaseView {
     public void showUPRefrush() {
         super.showUPRefrush();
         drawText = upText;
-        dragAnimation.setIntValues(dragRoat, 180);
+        dragAnimation.setIntValues(dragRoat, 0);
         dragAnimation.start();
     }
 
@@ -180,7 +180,7 @@ public class DefaultLoadMoreView extends BaseView {
     public void showDrag() {
         state = DRAGREFRUSH;
         drawText = dragText;
-        dragAnimation.setIntValues(dragRoat, 0);
+        dragAnimation.setIntValues(dragRoat, 180);
         dragAnimation.start();
     }
 

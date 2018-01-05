@@ -19,6 +19,8 @@ import sang.com.freerecycleview.adapter.XAdapter;
 import sang.com.freerecycleview.holder.BaseHolder;
 import sang.com.freerecycleview.view.RefrushRecycleView;
 import sang.com.freerecycleview.view.SpringRecycleView;
+import sang.com.freerecycleview.view.refrush.DragLoading;
+import sang.com.freerecycleview.view.refrush.LoadViewFactory;
 import sang.com.freerecycleview.view.refrush.RefrushControl;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -36,9 +38,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         mContext = this;
         initView();
-
-
     }
+
+
 
     private void initView() {
         recyclerView = (RefrushRecycleView) findViewById(R.id.rv);
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 adapter.notifyDataSetChanged();
-                recyclerView.refrushSuccess(true,500);
+//                recyclerView.refrushSuccess(true,500);
             }
 
             @Override
@@ -101,7 +103,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 };
             }
         };
+
+
         recyclerView.setAdapter(adapter);
+        recyclerView.setTopView(LoadViewFactory.creatView(new DragLoading(this)));
+//        recyclerView.setTopView(LoadViewFactory.getDefaultRefrushView(this));
 
     }
 
