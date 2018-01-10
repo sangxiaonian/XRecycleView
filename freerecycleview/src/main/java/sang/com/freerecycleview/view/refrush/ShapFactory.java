@@ -111,10 +111,6 @@ public class ShapFactory {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
-
-        mPaint.setColor(Color.RED);
-        canvas.drawCircle(mWidth/2,mHeight/2,mWidth/2,mPaint);
-        mPaint.setColor(Color.BLACK);
         int count = 9;
         int offsetRoat = startRoat % count;
         int cellRadio = 360 / count;
@@ -128,7 +124,6 @@ public class ShapFactory {
 
         mPaint.setStrokeWidth(strokeWidth);
         mPaint.setAlpha(255);
-        canvas.drawPoint(mWidth/2,mHeight/2,mPaint);
         return bitmap;
     }
 

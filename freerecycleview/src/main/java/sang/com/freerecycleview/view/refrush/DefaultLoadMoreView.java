@@ -69,7 +69,7 @@ public class DefaultLoadMoreView extends BaseView {
 
         mPath = new Path();
 
-        loadAnmition = ValueAnimator.ofInt(0, Integer.MAX_VALUE);
+        loadAnmition = ValueAnimator.ofInt(0, 9);
         loadAnmition.setDuration(1000);
         loadAnmition.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

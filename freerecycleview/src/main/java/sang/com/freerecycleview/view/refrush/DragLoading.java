@@ -89,26 +89,28 @@ public class DragLoading extends BaseView {
         int measuredHeight = getMeasuredHeight();
 
 
-        drawRect.left = (measuredWidth - getStandSize()) / 2;
-        drawRect.top = (measuredHeight - getStandSize()) / 2;
-        drawRect.right = (measuredWidth + getStandSize()) / 2;
-        drawRect.bottom = (measuredHeight + getStandSize()) / 2;
-        mPath.reset();
-        float v = measuredHeight * 1.0f / getStandSize();
-        mPath.addArc(drawRect, -120, (float) Math.ceil(v * 360));
+        if (measuredHeight>getStandSize()/2){
+            drawRect.left = (measuredWidth - getStandSize()) / 2;
+            drawRect.top = (measuredHeight - getStandSize()) / 2;
+            drawRect.right = (measuredWidth + getStandSize()) / 2;
+            drawRect.bottom = (measuredHeight + getStandSize()) / 2;
+            mPath.reset();
 
-        mPath.lineTo(measuredWidth / 2, measuredHeight / 2);
-        mPath.close();
+            float v = (measuredHeight-getStandSize()/2) * 1.0f / (getStandSize()/2);
+            mPath.addArc(drawRect, -120, (float) Math.ceil(v * 360));
 
-        canvas.save();
-        if (v<=1) {
-            canvas.clipPath(mPath);
+            mPath.lineTo(measuredWidth / 2, measuredHeight / 2);
+            mPath.close();
+
+            canvas.save();
+            if (v<=1) {
+                canvas.clipPath(mPath);
+            }
+            drawLoading(canvas);
+            canvas.restore();
         }
-        drawLoading(canvas);
-        canvas.restore();
 
 
-        canvas.drawPoint(measuredWidth/2,measuredHeight/2,mPaint);
     }
 
     private void drawLoading(Canvas canvas) {
