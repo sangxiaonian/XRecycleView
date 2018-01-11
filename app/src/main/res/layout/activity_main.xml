@@ -7,30 +7,19 @@
     android:orientation="vertical"
     tools:context="sang.com.xrecycleview.MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
         <Button
-            android:layout_weight="1"
             android:id="@+id/bt_refrush"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="刷新完成" />
+            android:text="REFRUSH" />
 
         <Button
-            android:layout_weight="1"
-            android:id="@+id/bt_load"
-            android:layout_width="wrap_content"
+            android:id="@+id/bt_galley"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="加载完成" />
-    </LinearLayout>
+            android:text="GALLEY" />
 
 
-    <sang.com.freerecycleview.view.RefrushRecycleView
-        android:id="@+id/rv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+
 
 </LinearLayout>
